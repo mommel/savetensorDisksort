@@ -5,6 +5,7 @@ on:
     branches: [ "main", "master" ]
     paths:
       - 'docs/**'
+      - 'README.md'
 
 jobs:
   update-wiki:
