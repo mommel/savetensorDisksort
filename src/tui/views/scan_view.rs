@@ -8,6 +8,7 @@ use ratatui::Frame;
 
 use crate::config::DiskSortConfig;
 use crate::persistence::Inventory;
+use crate::tui::app::InputMode;
 
 pub fn render_scan_view(
     f: &mut Frame,
@@ -15,6 +16,9 @@ pub fn render_scan_view(
     config: &DiskSortConfig,
     inventory: Option<&Inventory>,
     is_scanning: bool,
+    input_mode: InputMode,
+    new_mountpoint_input: &str,
+    selected_mountpoint_idx: usize,
 ) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -70,6 +74,10 @@ pub fn render_scan_view(
         vec![
             Line::from("No scan performed yet in this session."),
             Line::from("Configure mountpoints below and press [S] to initiate parallel discovery."),
+            Line::from(vec![Span::styled(
+                "Actions: [N] Add Mountpoint  |  [Del] Remove Selected",
+                Style::default().fg(Color::DarkGray),
+            )]),
         ]
     };
 
@@ -88,21 +96,28 @@ pub fn render_scan_view(
     let mp_items: Vec<ListItem> = config
         .mountpoints
         .iter()
-        .map(|mp| {
+        .enumerate()
+        .map(|(i, mp)| {
             let label = mp.label.as_deref().unwrap_or("No label");
-            Line::from(vec![
-                Span::styled("📁 ", Style::default().fg(Color::Yellow)),
+            let mut style = Style::default().fg(Color::White);
+            if i == selected_mountpoint_idx {
+                style = style.bg(Color::DarkGray).add_modifier(Modifier::BOLD);
+            }
+            let prefix = if i == selected_mountpoint_idx { ">> 📁 " } else { "   📁 " };
+            
+            let line = Line::from(vec![
+                Span::styled(prefix, Style::default().fg(Color::Yellow)),
                 Span::styled(
                     format!("{:<30}", mp.path),
-                    Style::default().fg(Color::White),
+                    style,
                 ),
                 Span::styled(
                     format!(" [{}]", label),
                     Style::default().fg(Color::DarkGray),
                 ),
-            ])
+            ]);
+            ListItem::new(line)
         })
-        .map(ListItem::new)
         .collect();
 
     let mp_list = List::new(mp_items).block(
@@ -116,4 +131,23 @@ pub fn render_scan_view(
     );
 
     f.render_widget(mp_list, chunks[1]);
+
+    if input_mode == InputMode::AddingMountpoint {
+        let input_rect = Rect {
+            x: area.x + area.width / 4,
+            y: area.y + area.height / 2 - 2,
+            width: area.width / 2,
+            height: 3,
+        };
+        let input_p = Paragraph::new(new_mountpoint_input)
+            .style(Style::default().fg(Color::Yellow))
+            .block(
+                Block::default()
+                    .title(" Add New Mountpoint (Enter to Save, Esc to Cancel) ")
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::Magenta)),
+            );
+        f.render_widget(ratatui::widgets::Clear, input_rect);
+        f.render_widget(input_p, input_rect);
+    }
 }

@@ -20,6 +20,8 @@ pub enum Action {
     Execute,
     Refresh,
     Help,
+    AddMountpoint,
+    DeleteMountpoint,
     None,
 }
 
@@ -40,6 +42,8 @@ pub fn map_key(code: KeyCode) -> Action {
         KeyCode::Char('x') | KeyCode::Char('e') | KeyCode::Char('E') => Action::Execute,
         KeyCode::Char('r') | KeyCode::Char('R') => Action::Refresh,
         KeyCode::Char('?') => Action::Help,
+        KeyCode::Char('n') | KeyCode::Char('N') => Action::AddMountpoint,
+        KeyCode::Delete => Action::DeleteMountpoint,
         _ => Action::None,
     }
 }

@@ -62,6 +62,13 @@ impl AppTab {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InputMode {
+    Normal,
+    AddingMountpoint,
+}
+
+
 pub enum BackgroundMsg {
     ScanFinished(Inventory),
     PlanFinished(SortPlan),
@@ -90,6 +97,9 @@ pub struct App {
     pub current_percent: u16,
     pub log_messages: Vec<String>,
     pub cancel_flag: Arc<AtomicBool>,
+    pub input_mode: InputMode,
+    pub new_mountpoint_input: String,
+    pub selected_mountpoint_idx: usize,
     sender: Sender<BackgroundMsg>,
     receiver: Receiver<BackgroundMsg>,
 }
@@ -120,6 +130,9 @@ impl App {
             current_percent: 0,
             log_messages: Vec::new(),
             cancel_flag: Arc::new(AtomicBool::new(false)),
+            input_mode: InputMode::Normal,
+            new_mountpoint_input: String::new(),
+            selected_mountpoint_idx: 0,
             sender,
             receiver,
         }
@@ -275,6 +288,8 @@ impl App {
                     }
                 } else if self.current_tab == AppTab::Plan && self.selected_op_idx > 0 {
                     self.selected_op_idx -= 1;
+                } else if self.current_tab == AppTab::Scan && self.selected_mountpoint_idx > 0 {
+                    self.selected_mountpoint_idx -= 1;
                 }
             }
             Action::Down => {
@@ -290,6 +305,10 @@ impl App {
                         if self.selected_op_idx + 1 < plan.operations.len() {
                             self.selected_op_idx += 1;
                         }
+                    }
+                } else if self.current_tab == AppTab::Scan {
+                    if self.selected_mountpoint_idx + 1 < self.config.mountpoints.len() {
+                        self.selected_mountpoint_idx += 1;
                     }
                 }
             }
@@ -353,6 +372,24 @@ impl App {
             Action::Execute => {
                 self.start_execution(false);
             }
+            Action::AddMountpoint => {
+                if self.current_tab == AppTab::Scan {
+                    self.input_mode = InputMode::AddingMountpoint;
+                    self.new_mountpoint_input.clear();
+                }
+            }
+            Action::DeleteMountpoint => {
+                if self.current_tab == AppTab::Scan {
+                    if self.selected_mountpoint_idx < self.config.mountpoints.len() {
+                        self.config.mountpoints.remove(self.selected_mountpoint_idx);
+                        if self.selected_mountpoint_idx > 0 && self.selected_mountpoint_idx >= self.config.mountpoints.len() {
+                            self.selected_mountpoint_idx -= 1;
+                        }
+                        let config_path = std::path::PathBuf::from("disksort.json");
+                        let _ = self.config.save_to_file(config_path);
+                    }
+                }
+            }
             _ => {}
         }
         false
@@ -377,10 +414,36 @@ pub fn run_tui(config: DiskSortConfig) -> io::Result<()> {
 
         if event::poll(Duration::from_millis(50))? {
             if let Event::Key(key) = event::read()? {
-                let action = map_key(key.code);
-                let should_quit = app.handle_action(action);
-                if should_quit {
-                    break;
+                if app.input_mode == InputMode::AddingMountpoint {
+                    match key.code {
+                        crossterm::event::KeyCode::Enter => {
+                            if !app.new_mountpoint_input.is_empty() {
+                                app.config.mountpoints.push(crate::config::ConfigMountpoint {
+                                    path: app.new_mountpoint_input.clone(),
+                                    label: None,
+                                });
+                                let config_path = std::path::PathBuf::from("disksort.json");
+                                let _ = app.config.save_to_file(config_path);
+                            }
+                            app.input_mode = InputMode::Normal;
+                        }
+                        crossterm::event::KeyCode::Esc => {
+                            app.input_mode = InputMode::Normal;
+                        }
+                        crossterm::event::KeyCode::Backspace => {
+                            app.new_mountpoint_input.pop();
+                        }
+                        crossterm::event::KeyCode::Char(c) => {
+                            app.new_mountpoint_input.push(c);
+                        }
+                        _ => {}
+                    }
+                } else {
+                    let action = map_key(key.code);
+                    let should_quit = app.handle_action(action);
+                    if should_quit {
+                        break;
+                    }
                 }
             }
         }
@@ -438,6 +501,9 @@ fn render_app(f: &mut Frame, app: &App) {
                 &app.config,
                 app.inventory.as_ref(),
                 app.is_scanning,
+                app.input_mode,
+                &app.new_mountpoint_input,
+                app.selected_mountpoint_idx,
             );
         }
         AppTab::Inventory => {
