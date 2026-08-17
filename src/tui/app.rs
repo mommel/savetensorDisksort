@@ -306,10 +306,10 @@ impl App {
                             self.selected_op_idx += 1;
                         }
                     }
-                } else if self.current_tab == AppTab::Scan {
-                    if self.selected_mountpoint_idx + 1 < self.config.mountpoints.len() {
-                        self.selected_mountpoint_idx += 1;
-                    }
+                } else if self.current_tab == AppTab::Scan
+                    && self.selected_mountpoint_idx + 1 < self.config.mountpoints.len()
+                {
+                    self.selected_mountpoint_idx += 1;
                 }
             }
             Action::Select | Action::Right => {
@@ -378,18 +378,17 @@ impl App {
                     self.new_mountpoint_input.clear();
                 }
             }
-            Action::DeleteMountpoint => {
-                if self.current_tab == AppTab::Scan {
-                    if self.selected_mountpoint_idx < self.config.mountpoints.len() {
-                        self.config.mountpoints.remove(self.selected_mountpoint_idx);
-                        if self.selected_mountpoint_idx > 0 && self.selected_mountpoint_idx >= self.config.mountpoints.len() {
-                            self.selected_mountpoint_idx -= 1;
-                        }
-                        let config_path = std::path::PathBuf::from("disksort.json");
-                        let _ = self.config.save_to_file(config_path);
+            Action::DeleteMountpoint if self.current_tab == AppTab::Scan => {
+                if self.selected_mountpoint_idx < self.config.mountpoints.len() {
+                    self.config.mountpoints.remove(self.selected_mountpoint_idx);
+                    if self.selected_mountpoint_idx > 0 && self.selected_mountpoint_idx >= self.config.mountpoints.len() {
+                        self.selected_mountpoint_idx -= 1;
                     }
+                    let config_path = std::path::PathBuf::from("disksort.json");
+                    let _ = self.config.save_to_file(config_path);
                 }
             }
+            Action::DeleteMountpoint => {}
             _ => {}
         }
         false

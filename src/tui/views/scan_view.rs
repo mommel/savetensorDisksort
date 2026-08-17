@@ -10,6 +10,7 @@ use crate::config::DiskSortConfig;
 use crate::persistence::Inventory;
 use crate::tui::app::InputMode;
 
+#[allow(clippy::too_many_arguments)]
 pub fn render_scan_view(
     f: &mut Frame,
     area: Rect,
