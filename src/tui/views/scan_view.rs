@@ -104,14 +104,15 @@ pub fn render_scan_view(
             if i == selected_mountpoint_idx {
                 style = style.bg(Color::DarkGray).add_modifier(Modifier::BOLD);
             }
-            let prefix = if i == selected_mountpoint_idx { ">> 📁 " } else { "   📁 " };
-            
+            let prefix = if i == selected_mountpoint_idx {
+                ">> 📁 "
+            } else {
+                "   📁 "
+            };
+
             let line = Line::from(vec![
                 Span::styled(prefix, Style::default().fg(Color::Yellow)),
-                Span::styled(
-                    format!("{:<30}", mp.path),
-                    style,
-                ),
+                Span::styled(format!("{:<30}", mp.path), style),
                 Span::styled(
                     format!(" [{}]", label),
                     Style::default().fg(Color::DarkGray),

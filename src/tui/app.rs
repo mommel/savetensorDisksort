@@ -68,7 +68,6 @@ pub enum InputMode {
     AddingMountpoint,
 }
 
-
 pub enum BackgroundMsg {
     ScanFinished(Inventory),
     PlanFinished(SortPlan),
@@ -381,7 +380,9 @@ impl App {
             Action::DeleteMountpoint if self.current_tab == AppTab::Scan => {
                 if self.selected_mountpoint_idx < self.config.mountpoints.len() {
                     self.config.mountpoints.remove(self.selected_mountpoint_idx);
-                    if self.selected_mountpoint_idx > 0 && self.selected_mountpoint_idx >= self.config.mountpoints.len() {
+                    if self.selected_mountpoint_idx > 0
+                        && self.selected_mountpoint_idx >= self.config.mountpoints.len()
+                    {
                         self.selected_mountpoint_idx -= 1;
                     }
                     let config_path = std::path::PathBuf::from("disksort.json");
@@ -417,10 +418,12 @@ pub fn run_tui(config: DiskSortConfig) -> io::Result<()> {
                     match key.code {
                         crossterm::event::KeyCode::Enter => {
                             if !app.new_mountpoint_input.is_empty() {
-                                app.config.mountpoints.push(crate::config::ConfigMountpoint {
-                                    path: app.new_mountpoint_input.clone(),
-                                    label: None,
-                                });
+                                app.config
+                                    .mountpoints
+                                    .push(crate::config::ConfigMountpoint {
+                                        path: app.new_mountpoint_input.clone(),
+                                        label: None,
+                                    });
                                 let config_path = std::path::PathBuf::from("disksort.json");
                                 let _ = app.config.save_to_file(config_path);
                             }
