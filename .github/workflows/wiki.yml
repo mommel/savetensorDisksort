@@ -35,7 +35,7 @@ jobs:
         rsync -av --delete --exclude='.git' source/docs/ wiki/
         
         # Optional: if you want the main README to be the Wiki home page:
-        cp README.md wiki/Home.md
+        cp source/README.md wiki/Home.md
         
         cd wiki
         git config user.name "github-actions[bot]"
