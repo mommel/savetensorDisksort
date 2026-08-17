@@ -45,7 +45,7 @@ pub fn find_duplicate_candidates(files: &[FileInfo]) -> Vec<DuplicateGroup> {
     }
 
     // Sort by largest size first for easier review
-    groups.sort_by(|a, b| b.size_bytes.cmp(&a.size_bytes));
+    groups.sort_by_key(|b| std::cmp::Reverse(b.size_bytes));
     groups
 }
 

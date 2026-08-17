@@ -107,9 +107,11 @@ mod tests {
     #[test]
     fn test_matching_mountpoint() {
         let dir = tempdir().unwrap();
-        let mp1 = dir.path().join("mnt").join("drive1");
-        let mp2 = dir.path().join("mnt").join("drive1_usb");
-        let mp3 = dir.path().join("mnt").join("drive2");
+        // Resolve any short paths (like RUNNER~1) to long paths on Windows
+        let base_path = canonicalize_lossy(dir.path());
+        let mp1 = base_path.join("mnt").join("drive1");
+        let mp2 = base_path.join("mnt").join("drive1_usb");
+        let mp3 = base_path.join("mnt").join("drive2");
 
         fs::create_dir_all(&mp1).unwrap();
         fs::create_dir_all(&mp2).unwrap();

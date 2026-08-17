@@ -38,7 +38,7 @@ impl FolderNode {
         let child = self
             .children
             .entry(first.to_string())
-            .or_insert_with(FolderNode::new);
+            .or_default();
         child.insert_file(&components[1..], size_bytes);
     }
 
@@ -71,7 +71,7 @@ pub fn build_folder_tree(files: &[FileInfo]) -> BTreeMap<String, FolderNode> {
 
     for file in files {
         let root_key = &file.mountpoint;
-        let root_node = tree.entry(root_key.clone()).or_insert_with(FolderNode::new);
+        let root_node = tree.entry(root_key.clone()).or_default();
 
         let parts: Vec<&str> = file
             .relative_path

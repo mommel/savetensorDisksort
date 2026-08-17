@@ -75,7 +75,7 @@ pub fn scan_mountpoint<P: AsRef<Path>>(
 
         let size_bytes = metadata.len();
         let modified_at: Option<DateTime<Utc>> =
-            metadata.modified().ok().map(|st| DateTime::<Utc>::from(st));
+            metadata.modified().ok().map(DateTime::<Utc>::from);
 
         let filename = path
             .file_name()

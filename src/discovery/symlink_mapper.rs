@@ -28,6 +28,12 @@ pub struct SymlinkTreeNode {
     pub children: HashMap<String, SymlinkTreeNode>,
 }
 
+impl Default for SymlinkTreeNode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SymlinkTreeNode {
     pub fn new() -> Self {
         Self {

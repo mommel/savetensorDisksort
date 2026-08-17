@@ -63,7 +63,7 @@ fn test_integration_discovery_and_symlinks() {
 
     // Run Symlink Mapping
     let mut mapper = SymlinkMapper::new();
-    mapper.scan_app_roots(&[app_root.clone()]);
+    mapper.scan_app_roots(std::slice::from_ref(&app_root));
     mapper.cross_reference_inventory(&mut files);
 
     let updated_f1 = files

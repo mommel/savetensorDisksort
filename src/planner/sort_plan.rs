@@ -252,10 +252,9 @@ pub fn calculate_space_analysis(
             // Extract mountpoint from source
             let src_path = PathBuf::from(&op.source);
             let mut drive_root = String::new();
-            for comp in src_path.components() {
+            if let Some(comp) = src_path.components().next() {
                 drive_root.push_str(&comp.as_os_str().to_string_lossy());
                 drive_root.push('/');
-                break;
             }
             *source_drives_freed.entry(drive_root).or_insert(0u64) += op.size_bytes;
         }

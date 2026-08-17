@@ -8,6 +8,7 @@ use ratatui::Frame;
 
 use crate::tui::widgets::render_transfer_progress;
 
+#[allow(clippy::too_many_arguments)]
 pub fn render_exec_view(
     f: &mut Frame,
     area: Rect,
