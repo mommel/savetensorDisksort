@@ -27,12 +27,11 @@ jobs:
 
     - name: Copy Docs and Push to Wiki
       run: |
-        # Clear out existing markdown files in the wiki to handle file deletions/renames
-        # We leave the .git folder intact
-        find wiki -type f -name "*.md" -delete
-        
-        # Copy everything from our local docs folder into the wiki
-        cp -R source/docs/* wiki/
+        # Use rsync to perfectly mirror the docs folder into the wiki
+        # This copies all files (including hidden ones, subdirectories, non-md files)
+        # and removes files in the wiki that no longer exist in docs,
+        # while explicitly preserving the .git folder.
+        rsync -av --delete --exclude='.git' source/docs/ wiki/
         
         # Optional: if you want the main README to be the Wiki home page:
         # cp source/README.md wiki/Home.md
