@@ -273,10 +273,9 @@ impl App {
                     if self.tree_state.selected_index > 0 {
                         self.tree_state.selected_index -= 1;
                     }
-                } else if self.current_tab == AppTab::Plan
-                    && self.selected_op_idx > 0 {
-                        self.selected_op_idx -= 1;
-                    }
+                } else if self.current_tab == AppTab::Plan && self.selected_op_idx > 0 {
+                    self.selected_op_idx -= 1;
+                }
             }
             Action::Down => {
                 if self.current_tab == AppTab::Inventory {

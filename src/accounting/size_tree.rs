@@ -35,10 +35,7 @@ impl FolderNode {
         }
 
         let first = components[0];
-        let child = self
-            .children
-            .entry(first.to_string())
-            .or_default();
+        let child = self.children.entry(first.to_string()).or_default();
         child.insert_file(&components[1..], size_bytes);
     }
 
