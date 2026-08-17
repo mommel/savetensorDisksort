@@ -24,7 +24,6 @@ So what are the points that must be covered by the tool?
 The language of the code is totally up to you. The tool itself should be robust and fast.
 
 So please create that plan as `plans/planningstage.md` be detailed, be professional so that the development can be started on your plan afterwards, be precise, explain your decissions, mark pitfalls, and it would be super if you could plan it as tdd. With discreet testable steps to develop. But if that's too much skip the tdd thing.
-`
 
 ## You wan to use this tool?
 
