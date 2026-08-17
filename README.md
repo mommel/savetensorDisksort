@@ -24,3 +24,17 @@ So what are the points that must be covered by the tool?
 The language of the code is totally up to you. The tool itself should be robust and fast.
 
 So please create that plan as `plans/planningstage.md` be detailed, be professional so that the development can be started on your plan afterwards, be precise, explain your decissions, mark pitfalls, and it would be super if you could plan it as tdd. With discreet testable steps to develop. But if that's too much skip the tdd thing.
+`
+
+## You wan to use this tool?
+
+__DO IT AT YOUR OWN RISK__
+
+This tool is vibe-coded. I built it to solve a problem of my own, not to be a production-ready or foolproof solution.
+
+Using this tool may result in partial or total data loss. Make backups before using it.
+
+## DISCLAIMER
+
+This tool is provided **without any warranty or guarantee**. Use it entirely at your own risk. 
+The author assumes no responsibility or liability for data loss, corrupted files, system damage, malfunction, unexpected behavior, or any other issues resulting from the use or misuse of this tool.
