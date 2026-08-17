@@ -34,7 +34,9 @@ pub fn render_scan_view(
             Line::from(vec![
                 Span::raw("Last Scan Time: "),
                 Span::styled(
-                    inv.scan_timestamp.format("%Y-%m-%d %H:%M:%S UTC").to_string(),
+                    inv.scan_timestamp
+                        .format("%Y-%m-%d %H:%M:%S UTC")
+                        .to_string(),
                     Style::default().fg(Color::Cyan),
                 ),
             ]),
@@ -42,12 +44,16 @@ pub fn render_scan_view(
                 Span::raw("Total Files Found: "),
                 Span::styled(
                     inv.summary.total_files.to_string(),
-                    Style::default().fg(Color::Green).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Green)
+                        .add_modifier(Modifier::BOLD),
                 ),
                 Span::raw("  |  Total Size: "),
                 Span::styled(
                     &inv.summary.total_size_human,
-                    Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
                 ),
                 Span::raw("  |  Duplicate Candidates: "),
                 Span::styled(
@@ -55,12 +61,10 @@ pub fn render_scan_view(
                     Style::default().fg(Color::Magenta),
                 ),
             ]),
-            Line::from(vec![
-                Span::styled(
-                    "Actions: Press [S] to Rescan  |  [Tab] to View Inventory  |  [P] to Plan Sort",
-                    Style::default().fg(Color::DarkGray),
-                ),
-            ]),
+            Line::from(vec![Span::styled(
+                "Actions: Press [S] to Rescan  |  [Tab] to View Inventory  |  [P] to Plan Sort",
+                Style::default().fg(Color::DarkGray),
+            )]),
         ]
     } else {
         vec![
@@ -88,8 +92,14 @@ pub fn render_scan_view(
             let label = mp.label.as_deref().unwrap_or("No label");
             Line::from(vec![
                 Span::styled("📁 ", Style::default().fg(Color::Yellow)),
-                Span::styled(format!("{:<30}", mp.path), Style::default().fg(Color::White)),
-                Span::styled(format!(" [{}]", label), Style::default().fg(Color::DarkGray)),
+                Span::styled(
+                    format!("{:<30}", mp.path),
+                    Style::default().fg(Color::White),
+                ),
+                Span::styled(
+                    format!(" [{}]", label),
+                    Style::default().fg(Color::DarkGray),
+                ),
             ])
         })
         .map(ListItem::new)
@@ -97,7 +107,10 @@ pub fn render_scan_view(
 
     let mp_list = List::new(mp_items).block(
         Block::default()
-            .title(format!("Configured Mountpoints ({})", config.mountpoints.len()))
+            .title(format!(
+                "Configured Mountpoints ({})",
+                config.mountpoints.len()
+            ))
             .borders(Borders::ALL)
             .border_style(Style::default().fg(Color::Cyan)),
     );

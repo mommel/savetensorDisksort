@@ -114,7 +114,10 @@ impl SortPlan {
             let count = dest_counts.entry(dest_str.clone()).or_insert(0);
             if *count > 0 {
                 let path_buf = PathBuf::from(&dest_str);
-                let stem = path_buf.file_stem().and_then(|s| s.to_str()).unwrap_or("file");
+                let stem = path_buf
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .unwrap_or("file");
                 let ext = path_buf.extension().and_then(|e| e.to_str()).unwrap_or("");
                 let parent = path_buf.parent().unwrap_or_else(|| Path::new(""));
 
@@ -291,7 +294,9 @@ mod tests {
                 modified_at: None,
                 mountpoint: "/mnt/nvme0".into(),
                 relative_path: "models/v1-5.safetensors".into(),
-                symlinked_from: vec!["/home/user/ComfyUI/models/checkpoints/v1-5.safetensors".into()],
+                symlinked_from: vec![
+                    "/home/user/ComfyUI/models/checkpoints/v1-5.safetensors".into()
+                ],
             },
             FileInfo {
                 id: "f-0002".into(),

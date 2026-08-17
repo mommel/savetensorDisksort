@@ -1,8 +1,8 @@
 //! Crash recovery and operation journal analysis.
 
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-use serde::{Deserialize, Serialize};
 
 use crate::executor::cleanup::{delete_source_file, update_symlinks};
 use crate::executor::verify::verify_copy;
@@ -11,9 +11,18 @@ use crate::persistence::log::LogEvent;
 /// Recovery status of an interrupted operation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RecoveryAction {
-    CleanIncompleteDest { dst: String },
-    Reverify { src: String, dst: String },
-    ResumeSymlinkUpdate { src: String, dst: String, symlinks: Vec<String> },
+    CleanIncompleteDest {
+        dst: String,
+    },
+    Reverify {
+        src: String,
+        dst: String,
+    },
+    ResumeSymlinkUpdate {
+        src: String,
+        dst: String,
+        symlinks: Vec<String>,
+    },
     AlreadyCompleted,
     None,
 }
@@ -59,11 +68,7 @@ pub fn analyze_operation_recovery(events: &[LogEvent]) -> RecoveryAction {
     }
 
     if has_delete_original {
-        return RecoveryAction::ResumeSymlinkUpdate {
-            src,
-            dst,
-            symlinks,
-        };
+        return RecoveryAction::ResumeSymlinkUpdate { src, dst, symlinks };
     }
 
     if has_verify_ok {
@@ -105,7 +110,10 @@ pub fn execute_recovery_action(action: &RecoveryAction) -> Result<String, String
                 return Err(format!("Source file '{}' missing during reverify", src));
             }
             if !dst_p.exists() {
-                return Err(format!("Destination file '{}' missing during reverify", dst));
+                return Err(format!(
+                    "Destination file '{}' missing during reverify",
+                    dst
+                ));
             }
 
             match verify_copy(src_p, dst_p, |_, _| {}) {
@@ -119,11 +127,7 @@ pub fn execute_recovery_action(action: &RecoveryAction) -> Result<String, String
                 Err(e) => Err(format!("Re-verification failed: {}", e)),
             }
         }
-        RecoveryAction::ResumeSymlinkUpdate {
-            src,
-            dst,
-            symlinks,
-        } => {
+        RecoveryAction::ResumeSymlinkUpdate { src, dst, symlinks } => {
             let src_p = Path::new(src);
             let dst_p = Path::new(dst);
             update_symlinks(src_p, dst_p, symlinks);

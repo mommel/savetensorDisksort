@@ -14,6 +14,6 @@ pub mod utils;
 pub use config::DiskSortConfig;
 pub use discovery::{Category, FileInfo, MountpointInfo, SymlinkMapper};
 pub use executor::{execute_plan, ExecutionOptions};
-pub use persistence::{Inventory, InventorySummary, LogEvent, ExecutionLogger};
+pub use persistence::{ExecutionLogger, Inventory, InventorySummary, LogEvent};
 pub use planner::{PlanAction, PlanTemplate, SortOperation, SortPlan};
 pub use utils::format_bytes;

@@ -33,7 +33,12 @@ mod tests {
 
     #[test]
     fn test_plan_save_load() {
-        let plan = SortPlan::generate(&[], "/mnt/target", 1_000_000_000, crate::planner::PlanTemplate::ByType);
+        let plan = SortPlan::generate(
+            &[],
+            "/mnt/target",
+            1_000_000_000,
+            crate::planner::PlanTemplate::ByType,
+        );
         let file = NamedTempFile::new().unwrap();
 
         save_plan_to_file(file.path(), &plan).unwrap();

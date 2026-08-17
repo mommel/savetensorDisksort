@@ -98,7 +98,10 @@ mod tests {
     fn test_category_parsing() {
         assert_eq!(Category::parse("Lora"), Some(Category::Lora));
         assert_eq!(Category::parse("checkpoints"), Some(Category::Checkpoint));
-        assert_eq!(Category::parse("textual_inversion"), Some(Category::Embedding));
+        assert_eq!(
+            Category::parse("textual_inversion"),
+            Some(Category::Embedding)
+        );
         assert_eq!(Category::parse("unknown_xyz"), None);
     }
 }

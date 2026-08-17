@@ -21,9 +21,18 @@ fn test_e2e_full_workflow() {
     let drive_target = root.path().join("drives").join("drive_target");
     let app_root = root.path().join("apps").join("webui");
 
-    let ckpt1 = drive1.join("models").join("checkpoints").join("model_a.safetensors");
-    let ckpt2 = drive2.join("models").join("checkpoints").join("model_b.safetensors");
-    let lora1 = drive1.join("models").join("loras").join("style_a.safetensors");
+    let ckpt1 = drive1
+        .join("models")
+        .join("checkpoints")
+        .join("model_a.safetensors");
+    let ckpt2 = drive2
+        .join("models")
+        .join("checkpoints")
+        .join("model_b.safetensors");
+    let lora1 = drive1
+        .join("models")
+        .join("loras")
+        .join("style_a.safetensors");
 
     fs::create_dir_all(ckpt1.parent().unwrap()).unwrap();
     fs::create_dir_all(ckpt2.parent().unwrap()).unwrap();
@@ -72,13 +81,19 @@ fn test_e2e_full_workflow() {
     mapper.scan_app_roots(&config.app_root_paths());
     mapper.cross_reference_inventory(&mut files);
 
-    let mp_infos = mp_paths.iter().map(|p| inspect_mountpoint(p, None)).collect();
+    let mp_infos = mp_paths
+        .iter()
+        .map(|p| inspect_mountpoint(p, None))
+        .collect();
     let inv = Inventory::build(mp_infos, files.clone(), mapper.symlink_tree);
     let inv_path = PathBuf::from(&config.output_dir).join("inventory.json");
     inv.save_to_file(&inv_path).unwrap();
 
     assert_eq!(inv.summary.total_files, 3);
-    assert_eq!(inv.summary.total_size_bytes, (data_a.len() + data_b.len() + data_lora.len()) as u64);
+    assert_eq!(
+        inv.summary.total_size_bytes,
+        (data_a.len() + data_b.len() + data_lora.len()) as u64
+    );
 
     // Step 2: Plan
     let target_str = normalize_path(&drive_target);
@@ -119,9 +134,18 @@ fn test_e2e_full_workflow() {
     assert!(!ckpt2.exists());
     assert!(!lora1.exists());
 
-    let dest_a = drive_target.join("models").join("checkpoints").join("model_a.safetensors");
-    let dest_b = drive_target.join("models").join("checkpoints").join("model_b.safetensors");
-    let dest_lora = drive_target.join("models").join("loras").join("style_a.safetensors");
+    let dest_a = drive_target
+        .join("models")
+        .join("checkpoints")
+        .join("model_a.safetensors");
+    let dest_b = drive_target
+        .join("models")
+        .join("checkpoints")
+        .join("model_b.safetensors");
+    let dest_lora = drive_target
+        .join("models")
+        .join("loras")
+        .join("style_a.safetensors");
 
     assert!(dest_a.exists());
     assert!(dest_b.exists());
@@ -145,7 +169,10 @@ fn test_e2e_insufficient_space_validation() {
     assert!(!plan.space_analysis.fits);
     let val = validate_plan(&plan);
     assert!(!val.is_valid);
-    assert!(val.errors.iter().any(|e| e.contains("Insufficient disk space")));
+    assert!(val
+        .errors
+        .iter()
+        .any(|e| e.contains("Insufficient disk space")));
 }
 
 #[test]
@@ -155,7 +182,10 @@ fn test_e2e_user_modified_json_plan() {
     fs::write(&src_file, b"User custom plan test content").unwrap();
     let original_hash = hash_file(&src_file).unwrap();
 
-    let custom_dest = root.path().join("custom_folder").join("renamed.safetensors");
+    let custom_dest = root
+        .path()
+        .join("custom_folder")
+        .join("renamed.safetensors");
 
     let files = scan_all_mountpoints(&[root.path().to_path_buf()]);
     let mut plan = SortPlan::generate(&files, "/target", 1_000_000_000, PlanTemplate::ByType);
@@ -168,7 +198,10 @@ fn test_e2e_user_modified_json_plan() {
 
     // Reload and execute
     let mut reloaded_plan = load_plan_from_file(&plan_file).unwrap();
-    assert_eq!(reloaded_plan.operations[0].destination, normalize_path(&custom_dest));
+    assert_eq!(
+        reloaded_plan.operations[0].destination,
+        normalize_path(&custom_dest)
+    );
 
     let options = ExecutionOptions {
         dry_run: false,

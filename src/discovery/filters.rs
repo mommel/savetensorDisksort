@@ -4,15 +4,7 @@ use super::file_info::Category;
 use std::path::Path;
 
 /// Standard file extensions recognized as AI model checkpoints or weights.
-pub const MODEL_EXTENSIONS: &[&str] = &[
-    "safetensors",
-    "pt",
-    "pth",
-    "ckpt",
-    "bin",
-    "gguf",
-    "onnx",
-];
+pub const MODEL_EXTENSIONS: &[&str] = &["safetensors", "pt", "pth", "ckpt", "bin", "gguf", "onnx"];
 
 /// Check if a filename extension matches the supported model extensions.
 pub fn is_model_extension(ext: &str) -> bool {
@@ -53,7 +45,10 @@ pub fn detect_category<P: AsRef<Path>>(path: P, size_bytes: u64) -> Category {
         .unwrap_or_default();
 
     // 1. VAE: filename or parent directory mentions "vae"
-    if filename_lower.contains("vae") || full_path_lower.contains("/vae/") || full_path_lower.contains("\\vae\\") {
+    if filename_lower.contains("vae")
+        || full_path_lower.contains("/vae/")
+        || full_path_lower.contains("\\vae\\")
+    {
         return Category::Vae;
     }
 
@@ -98,7 +93,8 @@ pub fn detect_category<P: AsRef<Path>>(path: P, size_bytes: u64) -> Category {
         || full_path_lower.contains("stable-diffusion")
         || full_path_lower.contains("diffusion_models")
         || full_path_lower.contains("unet")
-        || size_bytes > 1_073_741_824 // > 1 GB
+        || size_bytes > 1_073_741_824
+    // > 1 GB
     {
         return Category::Checkpoint;
     }
@@ -152,7 +148,10 @@ mod tests {
     fn test_detect_category_heuristics() {
         // VAE
         assert_eq!(
-            detect_category("models/vae/vae-ft-mse-840000-ema-pruned.safetensors", 335_000_000),
+            detect_category(
+                "models/vae/vae-ft-mse-840000-ema-pruned.safetensors",
+                335_000_000
+            ),
             Category::Vae
         );
         assert_eq!(
@@ -162,13 +161,19 @@ mod tests {
 
         // ControlNet
         assert_eq!(
-            detect_category("models/controlnet/control_v11p_sd15_canny.pth", 1_400_000_000),
+            detect_category(
+                "models/controlnet/control_v11p_sd15_canny.pth",
+                1_400_000_000
+            ),
             Category::Controlnet
         );
 
         // Upscaler
         assert_eq!(
-            detect_category("models/ESRGAN/4x_NMKD-Superscale-SP_178000_G.pth", 67_000_000),
+            detect_category(
+                "models/ESRGAN/4x_NMKD-Superscale-SP_178000_G.pth",
+                67_000_000
+            ),
             Category::Upscaler
         );
 

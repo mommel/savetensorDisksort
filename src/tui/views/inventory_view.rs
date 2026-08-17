@@ -41,11 +41,21 @@ pub fn render_inventory_view(
             let mut lines = vec![
                 Line::from(vec![
                     Span::styled("File ID: ", Style::default().fg(Color::DarkGray)),
-                    Span::styled(&file.id, Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+                    Span::styled(
+                        &file.id,
+                        Style::default()
+                            .fg(Color::Cyan)
+                            .add_modifier(Modifier::BOLD),
+                    ),
                 ]),
                 Line::from(vec![
                     Span::styled("Filename: ", Style::default().fg(Color::DarkGray)),
-                    Span::styled(&file.filename, Style::default().fg(Color::White).add_modifier(Modifier::BOLD)),
+                    Span::styled(
+                        &file.filename,
+                        Style::default()
+                            .fg(Color::White)
+                            .add_modifier(Modifier::BOLD),
+                    ),
                 ]),
                 Line::from(vec![
                     Span::styled("Category: ", Style::default().fg(Color::DarkGray)),
@@ -56,27 +66,35 @@ pub fn render_inventory_view(
                     Span::styled(&file.size_human, Style::default().fg(Color::Yellow)),
                     Span::raw(format!(" ({} bytes)", file.size_bytes)),
                 ]),
-                Line::from(vec![
-                    Span::styled("Physical Path: ", Style::default().fg(Color::DarkGray)),
-                ]),
-                Line::from(vec![
-                    Span::styled(format!("  {}", file.real_path), Style::default().fg(Color::White)),
-                ]),
+                Line::from(vec![Span::styled(
+                    "Physical Path: ",
+                    Style::default().fg(Color::DarkGray),
+                )]),
+                Line::from(vec![Span::styled(
+                    format!("  {}", file.real_path),
+                    Style::default().fg(Color::White),
+                )]),
                 Line::from(vec![
                     Span::styled("Mountpoint: ", Style::default().fg(Color::DarkGray)),
                     Span::styled(&file.mountpoint, Style::default().fg(Color::Cyan)),
                 ]),
                 Line::from(""),
-                Line::from(vec![
-                    Span::styled(
-                        format!("Symlinked From ({} applications):", file.symlinked_from.len()),
-                        Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD),
+                Line::from(vec![Span::styled(
+                    format!(
+                        "Symlinked From ({} applications):",
+                        file.symlinked_from.len()
                     ),
-                ]),
+                    Style::default()
+                        .fg(Color::Magenta)
+                        .add_modifier(Modifier::BOLD),
+                )]),
             ];
 
             if file.symlinked_from.is_empty() {
-                lines.push(Line::from(Span::styled("  (No application symlinks mapped)", Style::default().fg(Color::DarkGray))));
+                lines.push(Line::from(Span::styled(
+                    "  (No application symlinks mapped)",
+                    Style::default().fg(Color::DarkGray),
+                )));
             } else {
                 for link in &file.symlinked_from {
                     lines.push(Line::from(vec![
@@ -104,12 +122,9 @@ pub fn render_inventory_view(
 
         f.render_widget(details_p, chunks[1]);
     } else {
-        let empty_p = Paragraph::new("No inventory data loaded. Go to the Scan tab to discover files.")
-            .block(
-                Block::default()
-                    .title("Inventory")
-                    .borders(Borders::ALL),
-            );
+        let empty_p =
+            Paragraph::new("No inventory data loaded. Go to the Scan tab to discover files.")
+                .block(Block::default().title("Inventory").borders(Borders::ALL));
         f.render_widget(empty_p, area);
     }
 }

@@ -28,7 +28,7 @@ use super::widgets::{flatten_folder_tree, TreeItemState};
 use crate::config::DiskSortConfig;
 use crate::discovery::{inspect_mountpoint, scan_all_mountpoints, SymlinkMapper};
 use crate::executor::{execute_plan, ExecutionOptions};
-use crate::persistence::{Inventory, ExecutionLogger};
+use crate::persistence::{ExecutionLogger, Inventory};
 use crate::planner::{PlanTemplate, SortPlan};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -130,7 +130,8 @@ impl App {
             return;
         }
         self.is_scanning = true;
-        self.log_messages.push("Starting scan across all mountpoints...".into());
+        self.log_messages
+            .push("Starting scan across all mountpoints...".into());
 
         let mps = self.config.mountpoint_paths();
         let app_roots = self.config.app_root_paths();
@@ -143,10 +144,7 @@ impl App {
             mapper.scan_app_roots(&app_roots);
             mapper.cross_reference_inventory(&mut files);
 
-            let mountpoint_infos = mps
-                .iter()
-                .map(|p| inspect_mountpoint(p, None))
-                .collect();
+            let mountpoint_infos = mps.iter().map(|p| inspect_mountpoint(p, None)).collect();
 
             let inv = Inventory::build(mountpoint_infos, files, mapper.symlink_tree);
             let inv_path = PathBuf::from(&out_dir).join("inventory.json");
@@ -165,12 +163,7 @@ impl App {
             };
 
             let free_bytes = 1_000_000_000_000u64; // Default fallback or inspect
-            let plan = SortPlan::generate(
-                &inv.files,
-                &target,
-                free_bytes,
-                PlanTemplate::ByType,
-            );
+            let plan = SortPlan::generate(&inv.files, &target, free_bytes, PlanTemplate::ByType);
 
             let plan_path = PathBuf::from(&self.config.output_dir).join("sort_plan.json");
             let _ = crate::persistence::save_plan_to_file(plan_path, &plan);
@@ -452,9 +445,8 @@ fn render_app(f: &mut Frame, app: &App) {
         AppTab::Inventory => {
             let selected_file = if let Some(inv) = &app.inventory {
                 let rows = flatten_folder_tree(&inv.folder_tree, &app.tree_state);
-                rows.get(app.tree_state.selected_index).and_then(|r| {
-                    inv.files.iter().find(|f| f.real_path == r.id)
-                })
+                rows.get(app.tree_state.selected_index)
+                    .and_then(|r| inv.files.iter().find(|f| f.real_path == r.id))
             } else {
                 None
             };
@@ -489,26 +481,55 @@ fn render_app(f: &mut Frame, app: &App) {
 
     // Bottom: Status line and key shortcuts
     let status_text = Line::from(vec![
-        Span::styled(" [Tab] ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            " [Tab] ",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw("Next Tab  "),
-        Span::styled(" [Space] ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            " [Space] ",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw("Toggle  "),
-        Span::styled(" [D] ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            " [D] ",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw("Dry-Run  "),
-        Span::styled(" [X] ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            " [X] ",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw("Execute  "),
-        Span::styled(" [R] ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            " [R] ",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw("Rescan  "),
-        Span::styled(" [Q] ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            " [Q] ",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw("Quit"),
     ]);
 
-    let status_p = Paragraph::new(status_text)
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::DarkGray)),
-        );
+    let status_p = Paragraph::new(status_text).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(Color::DarkGray)),
+    );
 
     f.render_widget(status_p, chunks[2]);
 }

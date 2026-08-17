@@ -60,8 +60,14 @@ impl CheckboxList {
                     Span::styled(check, check_style),
                     Span::styled(status_icon, status_style),
                     Span::styled(format!("{:<32}", src_name), text_style),
-                    Span::styled(format!(" {:>10}", op.size_human), Style::default().fg(Color::Yellow)),
-                    Span::styled(format!("  → {}", op.destination), Style::default().fg(Color::DarkGray)),
+                    Span::styled(
+                        format!(" {:>10}", op.size_human),
+                        Style::default().fg(Color::Yellow),
+                    ),
+                    Span::styled(
+                        format!("  → {}", op.destination),
+                        Style::default().fg(Color::DarkGray),
+                    ),
                 ]);
 
                 ListItem::new(line)

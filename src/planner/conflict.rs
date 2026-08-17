@@ -1,7 +1,7 @@
 //! Destination naming conflict resolution and deduplication logic.
 
-use std::path::{Path, PathBuf};
 use crate::utils::normalize_path;
+use std::path::{Path, PathBuf};
 
 /// Generate a suffixed filename (e.g. `model_2.safetensors`) if destination collision occurs.
 pub fn generate_unique_destination<P: AsRef<Path>>(

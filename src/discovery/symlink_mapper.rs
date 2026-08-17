@@ -1,9 +1,9 @@
 //! Logical application tree walker and symlink resolver with cycle detection.
 
+use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
-use serde::{Deserialize, Serialize};
 
 use super::file_info::FileInfo;
 use crate::utils::{canonicalize_lossy, is_symlink, normalize_path};
@@ -147,7 +147,13 @@ impl SymlinkMapper {
                     if !visited.insert(canon_target.clone()) {
                         log::warn!("Symlink cycle detected at {}", path.display());
                     } else {
-                        self.walk_recursive(&canon_target, _app_root, visited, &mut child_node, depth + 1);
+                        self.walk_recursive(
+                            &canon_target,
+                            _app_root,
+                            visited,
+                            &mut child_node,
+                            depth + 1,
+                        );
                         visited.remove(&canon_target);
                     }
                 }

@@ -33,9 +33,7 @@ pub fn hash_file_with_progress<P: AsRef<Path>, F: FnMut(u64)>(
 
     // Try memory-mapping for non-empty files (best performance for multi-GB files)
     if let Ok(mmap) = unsafe { memmap2::Mmap::map(&file) } {
-        let hash = blake3::Hasher::new()
-            .update_rayon(&mmap)
-            .finalize();
+        let hash = blake3::Hasher::new().update_rayon(&mmap).finalize();
         progress_cb(file_len);
         return Ok(hash.to_hex().to_string());
     }

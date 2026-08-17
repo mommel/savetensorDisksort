@@ -165,7 +165,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let app_paths = config.app_root_paths();
             let mut mapper = SymlinkMapper::new();
             if !app_paths.is_empty() {
-                println!("==> Mapping symlinks across {} app roots...", app_paths.len());
+                println!(
+                    "==> Mapping symlinks across {} app roots...",
+                    app_paths.len()
+                );
                 mapper.scan_app_roots(&app_paths);
                 mapper.cross_reference_inventory(&mut files);
                 println!("==> Discovered {} symlink mappings.", mapper.mappings.len());
@@ -195,7 +198,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }) => {
             let inv_path = PathBuf::from(&config.output_dir).join("inventory.json");
             if !inv_path.exists() {
-                eprintln!("Error: No inventory found at '{}'. Run 'disksort scan' first.", inv_path.display());
+                eprintln!(
+                    "Error: No inventory found at '{}'. Run 'disksort scan' first.",
+                    inv_path.display()
+                );
                 std::process::exit(1);
             }
 
@@ -203,12 +209,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             if duplicates {
                 println!("\n=== Duplicate Candidates ===");
-                let dupes = savetensor_disksort::accounting::find_duplicate_candidates(&inventory.files);
+                let dupes =
+                    savetensor_disksort::accounting::find_duplicate_candidates(&inventory.files);
                 if dupes.is_empty() {
                     println!("No duplicate candidate files found.");
                 } else {
                     for d in dupes {
-                        println!("• {} ({}) - {} copies:", d.filename, d.size_human, d.paths.len());
+                        println!(
+                            "• {} ({}) - {} copies:",
+                            d.filename,
+                            d.size_human,
+                            d.paths.len()
+                        );
                         for p in &d.paths {
                             println!("    → {}", p);
                         }
@@ -228,11 +240,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("Duplicates:    {}", inventory.summary.duplicate_candidates);
                 println!("\nBreakdown by Category:");
                 for (cat, stat) in &inventory.summary.by_category {
-                    println!("  {:<14} : {:>4} files ({})", cat, stat.count, stat.size_human);
+                    println!(
+                        "  {:<14} : {:>4} files ({})",
+                        cat, stat.count, stat.size_human
+                    );
                 }
                 println!("\nBreakdown by Mountpoint:");
                 for (mp, stat) in &inventory.summary.by_mountpoint {
-                    println!("  {:<30} : {:>4} files ({})", mp, stat.count, stat.size_human);
+                    println!(
+                        "  {:<30} : {:>4} files ({})",
+                        mp, stat.count, stat.size_human
+                    );
                 }
             }
         }
@@ -246,7 +264,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let inventory = Inventory::load_from_file(&inv_path)?;
             let parsed_template = PlanTemplate::parse(&template).unwrap_or_else(|| {
-                eprintln!("Warning: Unknown template '{}', falling back to 'by-type'", template);
+                eprintln!(
+                    "Warning: Unknown template '{}', falling back to 'by-type'",
+                    template
+                );
                 PlanTemplate::ByType
             });
 
@@ -261,11 +282,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let plan_path = PathBuf::from(&config.output_dir).join("sort_plan.json");
             save_plan_to_file(&plan_path, &plan)?;
 
-            println!("✓ Sort plan generated with {} operations.", plan.operations.len());
+            println!(
+                "✓ Sort plan generated with {} operations.",
+                plan.operations.len()
+            );
             println!("  Target Drive:      {}", plan.target_drive);
-            println!("  Required Space:    {}", format_bytes(plan.space_analysis.total_move_size));
-            println!("  Target Free After: {}", format_bytes(plan.space_analysis.target_drive_free_after));
-            println!("  Capacity Status:   {}", if plan.space_analysis.fits { "OK (Fits with 5% safety margin)" } else { "INSUFFICIENT SPACE!" });
+            println!(
+                "  Required Space:    {}",
+                format_bytes(plan.space_analysis.total_move_size)
+            );
+            println!(
+                "  Target Free After: {}",
+                format_bytes(plan.space_analysis.target_drive_free_after)
+            );
+            println!(
+                "  Capacity Status:   {}",
+                if plan.space_analysis.fits {
+                    "OK (Fits with 5% safety margin)"
+                } else {
+                    "INSUFFICIENT SPACE!"
+                }
+            );
             println!("  Plan written to:   {}", plan_path.display());
         }
 
@@ -279,12 +316,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::process::exit(1);
             }
 
-            let plan_path = plan_file.unwrap_or_else(|| {
-                PathBuf::from(&config.output_dir).join("sort_plan.json")
-            });
+            let plan_path = plan_file
+                .unwrap_or_else(|| PathBuf::from(&config.output_dir).join("sort_plan.json"));
 
             if !plan_path.exists() {
-                eprintln!("Error: Sort plan not found at '{}'. Run 'disksort plan' first.", plan_path.display());
+                eprintln!(
+                    "Error: Sort plan not found at '{}'. Run 'disksort plan' first.",
+                    plan_path.display()
+                );
                 std::process::exit(1);
             }
 
@@ -308,7 +347,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             println!(
                 "==> Starting {} for {} planned operations...",
-                if dry_run { "DRY-RUN simulation" } else { "REAL relocation execution" },
+                if dry_run {
+                    "DRY-RUN simulation"
+                } else {
+                    "REAL relocation execution"
+                },
                 plan.operations.len()
             );
 
@@ -318,7 +361,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 cancel_flag: None,
                 progress_cb: |op_id, copied, total| {
                     if total > 0 && (copied == total || copied % (50 * 1024 * 1024) == 0) {
-                        println!("  [{}] Progress: {} / {}", op_id, format_bytes(copied), format_bytes(total));
+                        println!(
+                            "  [{}] Progress: {} / {}",
+                            op_id,
+                            format_bytes(copied),
+                            format_bytes(total)
+                        );
                     }
                 },
             };
@@ -346,7 +394,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let inventory = Inventory::load_from_file(&inv_path)?;
             println!("\n=== SaveTensor DiskSort Doctor Health Check ===");
-            println!("Checking {} files and symlink references...", inventory.files.len());
+            println!(
+                "Checking {} files and symlink references...",
+                inventory.files.len()
+            );
 
             let mut broken_symlinks = 0;
             for file in &inventory.files {

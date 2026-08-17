@@ -1,8 +1,8 @@
 //! Safe source deletion and atomic symlink redirection.
 
+use crate::utils::{canonicalize_lossy, normalize_path};
 use std::fs;
 use std::path::{Path, PathBuf};
-use crate::utils::{canonicalize_lossy, normalize_path};
 
 /// Remove the original source file.
 /// MUST ONLY be invoked after checksum verification has passed.
@@ -89,10 +89,7 @@ pub fn update_symlinks(
                     current_canon,
                     old_canon
                 );
-                results.push(Err(format!(
-                    "Symlink target mismatch for '{}'",
-                    link_str
-                )));
+                results.push(Err(format!("Symlink target mismatch for '{}'", link_str)));
                 continue;
             }
         }

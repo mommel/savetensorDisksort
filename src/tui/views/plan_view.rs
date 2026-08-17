@@ -24,7 +24,9 @@ pub fn render_plan_view(
 
         // Top: Space Analysis & Target Info
         let fits_style = if plan.space_analysis.fits {
-            Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)
+            Style::default()
+                .fg(Color::Green)
+                .add_modifier(Modifier::BOLD)
         } else {
             Style::default().fg(Color::Red).add_modifier(Modifier::BOLD)
         };
@@ -81,12 +83,10 @@ pub fn render_plan_view(
         );
         f.render_widget(op_list, chunks[1]);
     } else {
-        let empty_p = Paragraph::new("No sort plan generated yet. Generate one via CLI 'disksort plan' or from inventory.")
-            .block(
-                Block::default()
-                    .title("Sort Plan")
-                    .borders(Borders::ALL),
-            );
+        let empty_p = Paragraph::new(
+            "No sort plan generated yet. Generate one via CLI 'disksort plan' or from inventory.",
+        )
+        .block(Block::default().title("Sort Plan").borders(Borders::ALL));
         f.render_widget(empty_p, area);
     }
 }

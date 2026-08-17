@@ -1,7 +1,7 @@
 //! Duplicate file candidate detection by filename, exact size, and BLAKE3 hash.
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use crate::discovery::FileInfo;
 use crate::utils::format_bytes;

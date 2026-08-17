@@ -49,10 +49,16 @@ fn test_integration_discovery_and_symlinks() {
     let mut files = scan_all_mountpoints(&mountpoints);
 
     assert_eq!(files.len(), 2);
-    let f1 = files.iter().find(|f| f.filename == "v1-5-pruned.safetensors").unwrap();
+    let f1 = files
+        .iter()
+        .find(|f| f.filename == "v1-5-pruned.safetensors")
+        .unwrap();
     assert_eq!(f1.category, Category::Checkpoint);
 
-    let f2 = files.iter().find(|f| f.filename == "detail.safetensors").unwrap();
+    let f2 = files
+        .iter()
+        .find(|f| f.filename == "detail.safetensors")
+        .unwrap();
     assert_eq!(f2.category, Category::Lora);
 
     // Run Symlink Mapping
@@ -60,7 +66,10 @@ fn test_integration_discovery_and_symlinks() {
     mapper.scan_app_roots(&[app_root.clone()]);
     mapper.cross_reference_inventory(&mut files);
 
-    let updated_f1 = files.iter().find(|f| f.filename == "v1-5-pruned.safetensors").unwrap();
+    let updated_f1 = files
+        .iter()
+        .find(|f| f.filename == "v1-5-pruned.safetensors")
+        .unwrap();
     if symlink_path.exists() {
         assert_eq!(updated_f1.symlinked_from.len(), 1);
     }
@@ -73,7 +82,10 @@ fn test_integration_discovery_and_symlinks() {
 
     let inventory = Inventory::build(mp_infos, files, mapper.symlink_tree);
     assert_eq!(inventory.summary.total_files, 2);
-    assert_eq!(inventory.summary.total_size_bytes, (model_bytes.len() + lora_bytes.len()) as u64);
+    assert_eq!(
+        inventory.summary.total_size_bytes,
+        (model_bytes.len() + lora_bytes.len()) as u64
+    );
 
     let folder_tree = &inventory.folder_tree;
     assert_eq!(folder_tree.len(), 2);
@@ -119,7 +131,12 @@ fn test_integration_full_sort_lifecycle() {
 
     // 2. Plan
     let target_drive_str = normalize_path(&drive_usbc);
-    let mut plan = SortPlan::generate(&files, &target_drive_str, 500_000_000_000, PlanTemplate::ByType);
+    let mut plan = SortPlan::generate(
+        &files,
+        &target_drive_str,
+        500_000_000_000,
+        PlanTemplate::ByType,
+    );
     let plan_path = out_dir.join("sort_plan.json");
     save_plan_to_file(&plan_path, &plan).unwrap();
 
@@ -127,7 +144,10 @@ fn test_integration_full_sort_lifecycle() {
     assert!(validation.is_valid);
     assert_eq!(plan.operations.len(), 1);
 
-    let expected_dest = drive_usbc.join("models").join("checkpoints").join("v1-5-pruned.safetensors");
+    let expected_dest = drive_usbc
+        .join("models")
+        .join("checkpoints")
+        .join("v1-5-pruned.safetensors");
     assert_eq!(
         normalize_path(canonicalize_lossy(&expected_dest)),
         normalize_path(canonicalize_lossy(&plan.operations[0].destination))
@@ -144,7 +164,10 @@ fn test_integration_full_sort_lifecycle() {
     let dry_run_msgs = execute_plan(&mut plan, dry_run_options).unwrap();
     assert!(!dry_run_msgs.is_empty());
     assert!(model_src.exists(), "Dry run must NOT delete source file");
-    assert!(!expected_dest.exists(), "Dry run must NOT create destination file");
+    assert!(
+        !expected_dest.exists(),
+        "Dry run must NOT create destination file"
+    );
 
     // 4. Real Execution
     let log_path = out_dir.join("execution.jsonl");
@@ -161,19 +184,28 @@ fn test_integration_full_sort_lifecycle() {
     assert!(real_res.is_ok());
 
     // 5. Verification of post-execution state
-    assert!(!model_src.exists(), "Original source file must be safely removed after verification");
+    assert!(
+        !model_src.exists(),
+        "Original source file must be safely removed after verification"
+    );
     assert!(expected_dest.exists(), "Destination file must exist");
 
     // Verify destination bit-for-bit
     let dest_hash = hash_file(&expected_dest).unwrap();
-    assert_eq!(dest_hash, original_hash, "Destination BLAKE3 hash must match original bit-for-bit");
+    assert_eq!(
+        dest_hash, original_hash,
+        "Destination BLAKE3 hash must match original bit-for-bit"
+    );
 
     // Verify symlink was redirected if supported
     if app_ckpt.exists() {
         let dest_canon = normalize_path(canonicalize_lossy(&expected_dest));
         let link_target = fs::read_link(&app_ckpt).unwrap();
         let target_canon = normalize_path(canonicalize_lossy(&link_target));
-        assert_eq!(target_canon, dest_canon, "Symlink must point to new destination");
+        assert_eq!(
+            target_canon, dest_canon,
+            "Symlink must point to new destination"
+        );
     }
 
     // Verify execution log
@@ -232,7 +264,9 @@ fn test_integration_crash_recovery() {
     let recovery_action = analyze_operation_recovery(&events);
 
     match recovery_action {
-        savetensor_disksort::executor::RecoveryAction::CleanIncompleteDest { dst: ref target_dst } => {
+        savetensor_disksort::executor::RecoveryAction::CleanIncompleteDest {
+            dst: ref target_dst,
+        } => {
             assert_eq!(target_dst, &normalize_path(&dst));
             let res = execute_recovery_action(&recovery_action);
             assert!(res.is_ok());

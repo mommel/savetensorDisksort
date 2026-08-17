@@ -94,8 +94,14 @@ mod tests {
 
     #[test]
     fn test_normalize_path() {
-        assert_eq!(normalize_path(Path::new("models/sd/v1-5.safetensors")), "models/sd/v1-5.safetensors");
-        assert_eq!(normalize_path(r"C:\mount\models\test.pt"), "C:/mount/models/test.pt");
+        assert_eq!(
+            normalize_path(Path::new("models/sd/v1-5.safetensors")),
+            "models/sd/v1-5.safetensors"
+        );
+        assert_eq!(
+            normalize_path(r"C:\mount\models\test.pt"),
+            "C:/mount/models/test.pt"
+        );
     }
 
     #[test]

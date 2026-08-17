@@ -28,10 +28,7 @@ pub fn copy_with_progress<P1: AsRef<Path>, P2: AsRef<Path>, F: FnMut(u64, u64)>(
     // Use temporary destination during copy to avoid incomplete files in final path
     let tmp_dst_path = dst_path.with_extension(format!(
         "{}.disksort_tmp",
-        dst_path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("")
+        dst_path.extension().and_then(|e| e.to_str()).unwrap_or("")
     ));
 
     let dst_file = File::create(&tmp_dst_path)?;

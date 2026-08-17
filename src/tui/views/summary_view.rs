@@ -28,32 +28,43 @@ pub fn render_summary_view(f: &mut Frame, area: Rect, plan: Option<&SortPlan>) {
         }
 
         let mut res = vec![
-            Line::from(vec![
-                Span::styled(
-                    "Execution Summary Report",
-                    Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD),
-                ),
-            ]),
+            Line::from(vec![Span::styled(
+                "Execution Summary Report",
+                Style::default()
+                    .fg(Color::Cyan)
+                    .add_modifier(Modifier::BOLD),
+            )]),
             Line::from(""),
             Line::from(vec![
                 Span::raw("Operations Completed: "),
                 Span::styled(
                     completed_count.to_string(),
-                    Style::default().fg(Color::Green).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Green)
+                        .add_modifier(Modifier::BOLD),
                 ),
                 Span::raw("  |  Failed: "),
                 Span::styled(
                     failed_count.to_string(),
-                    Style::default().fg(if failed_count > 0 { Color::Red } else { Color::Green }),
+                    Style::default().fg(if failed_count > 0 {
+                        Color::Red
+                    } else {
+                        Color::Green
+                    }),
                 ),
                 Span::raw("  |  Skipped: "),
-                Span::styled(skipped_count.to_string(), Style::default().fg(Color::DarkGray)),
+                Span::styled(
+                    skipped_count.to_string(),
+                    Style::default().fg(Color::DarkGray),
+                ),
             ]),
             Line::from(vec![
                 Span::raw("Total Data Relocated: "),
                 Span::styled(
                     format_bytes(moved_bytes),
-                    Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
                 ),
             ]),
             Line::from(vec![
@@ -61,15 +72,24 @@ pub fn render_summary_view(f: &mut Frame, area: Rect, plan: Option<&SortPlan>) {
                 Span::styled(&plan.target_drive, Style::default().fg(Color::Cyan)),
             ]),
             Line::from(""),
-            Line::from(vec![
-                Span::styled("Estimated Space Freed per Source Drive:", Style::default().fg(Color::White).add_modifier(Modifier::BOLD)),
-            ]),
+            Line::from(vec![Span::styled(
+                "Estimated Space Freed per Source Drive:",
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
+            )]),
         ];
 
         for (drive, bytes) in &plan.space_analysis.source_drives_freed {
             res.push(Line::from(vec![
-                Span::styled(format!("  • {:<20}", drive), Style::default().fg(Color::Cyan)),
-                Span::styled(format!(" freed {}", format_bytes(*bytes)), Style::default().fg(Color::Green)),
+                Span::styled(
+                    format!("  • {:<20}", drive),
+                    Style::default().fg(Color::Cyan),
+                ),
+                Span::styled(
+                    format!(" freed {}", format_bytes(*bytes)),
+                    Style::default().fg(Color::Green),
+                ),
             ]));
         }
 

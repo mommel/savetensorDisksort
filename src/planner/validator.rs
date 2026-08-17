@@ -70,7 +70,10 @@ pub fn validate_plan(plan: &SortPlan) -> ValidationResult {
                 ));
             }
         } else {
-            errors.push(format!("Failed to read metadata for source file: {}", op.source));
+            errors.push(format!(
+                "Failed to read metadata for source file: {}",
+                op.source
+            ));
         }
 
         // Check if destination file already exists and would be overwritten
@@ -94,10 +97,10 @@ pub fn validate_plan(plan: &SortPlan) -> ValidationResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::NamedTempFile;
-    use crate::planner::sort_plan::{OpStatus, SpaceAnalysis, SortOperation};
+    use crate::planner::sort_plan::{OpStatus, SortOperation, SpaceAnalysis};
     use chrono::Utc;
     use std::collections::HashMap;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_validate_plan_missing_source() {

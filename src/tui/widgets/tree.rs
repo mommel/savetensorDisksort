@@ -76,14 +76,7 @@ fn flatten_node(
     if is_dir && is_expanded {
         for (child_name, child_node) in &node.children {
             let child_path = format!("{}/{}", full_path, child_name);
-            flatten_node(
-                child_name,
-                &child_path,
-                child_node,
-                depth + 1,
-                state,
-                out,
-            );
+            flatten_node(child_name, &child_path, child_node, depth + 1, state, out);
         }
     }
 }
@@ -112,7 +105,9 @@ pub fn render_folder_tree<'a>(rows: &'a [TreeRow], selected_idx: usize) -> Vec<L
                     .add_modifier(Modifier::BOLD)
                     .bg(Color::Rgb(30, 40, 60))
             } else if row.is_dir {
-                Style::default().fg(Color::White).add_modifier(Modifier::BOLD)
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD)
             } else {
                 Style::default().fg(Color::Gray)
             };

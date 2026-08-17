@@ -8,7 +8,9 @@ use walkdir::WalkDir;
 
 use super::file_info::{FileInfo, MountpointInfo};
 use super::filters::{detect_category, is_model_extension, should_exclude_path};
-use crate::utils::{canonicalize_lossy, find_matching_mountpoint, format_bytes, get_relative_path, normalize_path};
+use crate::utils::{
+    canonicalize_lossy, find_matching_mountpoint, format_bytes, get_relative_path, normalize_path,
+};
 
 /// Scan a single mountpoint directory for physical model files.
 /// Symlinks are strictly skipped.
@@ -18,7 +20,10 @@ pub fn scan_mountpoint<P: AsRef<Path>>(
 ) -> Vec<FileInfo> {
     let mp_path = mountpoint_path.as_ref();
     if !mp_path.exists() || !mp_path.is_dir() {
-        log::warn!("Mountpoint '{}' does not exist or is not a directory", mp_path.display());
+        log::warn!(
+            "Mountpoint '{}' does not exist or is not a directory",
+            mp_path.display()
+        );
         return Vec::new();
     }
 
@@ -69,10 +74,8 @@ pub fn scan_mountpoint<P: AsRef<Path>>(
         };
 
         let size_bytes = metadata.len();
-        let modified_at: Option<DateTime<Utc>> = metadata
-            .modified()
-            .ok()
-            .map(|st| DateTime::<Utc>::from(st));
+        let modified_at: Option<DateTime<Utc>> =
+            metadata.modified().ok().map(|st| DateTime::<Utc>::from(st));
 
         let filename = path
             .file_name()
@@ -80,8 +83,7 @@ pub fn scan_mountpoint<P: AsRef<Path>>(
             .unwrap_or("")
             .to_string();
 
-        let matched_mp = find_matching_mountpoint(path, mountpoints)
-            .unwrap_or(&mp_canon);
+        let matched_mp = find_matching_mountpoint(path, mountpoints).unwrap_or(&mp_canon);
         let rel_path = get_relative_path(path, matched_mp);
         let category = detect_category(path, size_bytes);
 
@@ -128,14 +130,12 @@ pub fn scan_all_mountpoints(mountpoints: &[PathBuf]) -> Vec<FileInfo> {
 pub fn inspect_mountpoint<P: AsRef<Path>>(path: P, label: Option<&str>) -> MountpointInfo {
     let p = path.as_ref();
     let norm_path = normalize_path(p);
-    let lbl = label
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| {
-            p.file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or(&norm_path)
-                .to_string()
-        });
+    let lbl = label.map(|s| s.to_string()).unwrap_or_else(|| {
+        p.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or(&norm_path)
+            .to_string()
+    });
 
     let mut total_bytes = 0u64;
     let mut free_bytes = 0u64;
@@ -201,7 +201,9 @@ mod tests {
         assert_eq!(files.len(), 2);
         assert_eq!(files[0].id, "f-0001");
         assert_eq!(files[1].id, "f-0002");
-        assert!(files.iter().any(|f| f.filename == "v1-5-pruned.safetensors"));
+        assert!(files
+            .iter()
+            .any(|f| f.filename == "v1-5-pruned.safetensors"));
         assert!(files.iter().any(|f| f.filename == "detail.safetensors"));
     }
 }

@@ -1,7 +1,7 @@
 //! Hierarchical folder tree with recursive size and file count aggregation.
 
-use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 use crate::discovery::FileInfo;
 use crate::utils::format_bytes;
@@ -35,7 +35,10 @@ impl FolderNode {
         }
 
         let first = components[0];
-        let child = self.children.entry(first.to_string()).or_insert_with(FolderNode::new);
+        let child = self
+            .children
+            .entry(first.to_string())
+            .or_insert_with(FolderNode::new);
         child.insert_file(&components[1..], size_bytes);
     }
 
